@@ -229,11 +229,11 @@ void aisradar_pi::ShowPreferencesDialog( wxWindow* parent ) {
     // Command
     wxBoxSizer* CommandBox = new wxBoxSizer(wxHORIZONTAL);
     wxStaticText* commandtext = new wxStaticText(dialog, -1, _("Command:"), wxDefaultPosition, wxSize(-1, -1), 0);
-    CommandBox->Add(commandtext, 0, wxALL, 5);
+    CommandBox->Add(commandtext, 0, wxRIGHT|wxALIGN_CENTER_VERTICAL);
 
     m_tCommand = new wxTextCtrl( dialog, -1, _("/home/pi/alarme.py"), wxDefaultPosition, wxSize(200,-1), wxTE_LEFT);
-    CommandBox->Add(m_tCommand, 0, wxALL, 5);
-    RadarBoxSizer->Add(m_tCommand, 0, wxALIGN_LEFT|wxALL, 5);
+    CommandBox->Add(m_tCommand, 0, wxALIGN_CENTER_VERTICAL);
+    RadarBoxSizer->Add(CommandBox, 0, wxALIGN_LEFT|wxALL, 5);
 
     wxStdDialogButtonSizer* DialogButtonSizer = dialog->CreateStdDialogButtonSizer(wxOK|wxCANCEL);
     PanelSizer->Add(DialogButtonSizer, 0, wxALIGN_RIGHT|wxALL, 5);
