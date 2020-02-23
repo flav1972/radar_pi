@@ -121,6 +121,7 @@ private:
     bool              m_radar_north_up;
     wxCheckBox       *m_pRadarShowIcon;
     wxCheckBox       *m_pRadarUseAis;
+    wxTextCtrl       *m_tCommand;
 };
 
 #endif
