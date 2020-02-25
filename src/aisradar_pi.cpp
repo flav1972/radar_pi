@@ -375,6 +375,54 @@ int aisradar_pi::GetCogArrowMinutes(void) {
 }
 
 
+bool aisradar_pi::GetbCPAMax(void) {
+    //bNoCPAMax  : bool g_bCPAMax : No (T)CPA Alerts if range is >
+    bool Result=true;
+    m_pconfig->SetPath ( _T( "/Settings/AIS" ) );
+    m_pconfig->Read ( _T( "bNoCPAMax" ),  &Result, 1 );
+    return Result;
+}
+
+double aisradar_pi::GetNoCPAMax(void) {
+    //NoCPAMaxNMi : no cpa alarm if range > this ; double g_CPAMax_NM
+    double Result=30.0;
+    m_pconfig->SetPath ( _T( "/Settings/AIS" ) );
+    m_pconfig->Read ( _T( "NoCPAMaxNMi" ),  &Result, 30.0 );
+    return Result;
+}
+
+bool aisradar_pi::GetbCPAWarn(void) {
+    //bCPAWarn : bool g_bCPAWarn
+    bool Result=true;
+    m_pconfig->SetPath ( _T( "/Settings/AIS" ) );
+    m_pconfig->Read ( _T( "bCPAWarn" ),  &Result, 1 );
+    return Result;
+}
+
+double aisradar_pi::GetCPAWarn(void) {
+    //CPAWarnNMi : CPA alarmi if CPA < this ; g_CPAWarn_NM
+    double Result=2.0;
+    m_pconfig->SetPath ( _T( "/Settings/AIS" ) );
+    m_pconfig->Read ( _T( "CPAWarnNMi" ),  &Result, 2.0 );
+    return Result;
+}
+
+bool aisradar_pi::GetbTCPAMax(void) {
+    //bTCPAMax : bool g_bTCPA_Max
+    bool Result=true;
+    m_pconfig->SetPath ( _T( "/Settings/AIS" ) );
+    m_pconfig->Read ( _T( "bTCPAMax" ),  &Result, 1 );
+    return Result;
+}
+
+double aisradar_pi::GetTCPAMax(void) {
+    //TCPAMaxMinutes : warn if CPA is less than this ; double g_TCPA_Max
+    double Result=30.0;
+    m_pconfig->SetPath ( _T( "/Settings/AIS" ) );
+    m_pconfig->Read ( _T( "TCPAMaxMinutes" ),  &Result, 30.0 );
+    return Result;
+}
+
 void aisradar_pi::SetColorScheme(PI_ColorScheme cs) {
     // Colours changed, pass the event on to the radarframe
     if ( m_pRadarFrame ) {
@@ -401,7 +449,7 @@ bool aisradar_pi::LoadConfig(void) {
         pConf->Read ( _T( "ShowRADARIcon" ),  &m_radar_show_icon, 1 );
         pConf->Read ( _T( "UseAisRadar" ),  &m_radar_use_ais, 1 );
         pConf->Read ( _T( "NorthUp" ),  &m_radar_north_up, 0 );
-        pConf->Read ( _T ( "RadarCommand" ), &m_command, _T("autre commande"));
+        pConf->Read ( _T ( "RadarCommand" ), &m_command, _T(" commande"));
         m_radar_frame_sx  = pConf->Read ( _T ( "RADARDialogSizeX" ),   300L );
         m_radar_frame_sy  = pConf->Read ( _T ( "RADARDialogSizeY" ),   300L );
         m_radar_frame_x   = pConf->Read ( _T ( "RADARDialogPosX" ),     50L );

@@ -296,10 +296,6 @@ void RadarFrame::TrimAisField(wxString *fld) {
 void RadarFrame::renderBoats(wxDC& dc, wxPoint &center, wxSize &size, int radius, ArrayOfPlugIn_AIS_Targets *AisTargets ) {
     time_t now;
 
-    wxString logs = _T("Render Boats");
-    logs += " 1";
-    wxLogMessage(logs);
-    
     now = time(NULL);
 
     bool check_alarm = (now - this->m_lastCheck) > 30; 
@@ -319,6 +315,23 @@ void RadarFrame::renderBoats(wxDC& dc, wxPoint &center, wxSize &size, int radius
     bool   m_ShowCogArrows=pPlugIn->ShowCogArrows();
     int    m_CogArrowMinutes=pPlugIn->GetCogArrowMinutes();
 
+    // Get alarm settings
+    bool   m_bCPAMax=pPlugIn->GetbCPAMax(); //bNoCPAMax  : bool g_bCPAMax : No (T)CPA Alerts if range is >
+    double m_CPAMax_NM=pPlugIn->GetNoCPAMax(); //NoCPAMaxNMi : no cpa alarm if range > this ; double g_CPAMax_NM
+    bool   m_bCPAWarn=pPlugIn->GetbCPAWarn(); //bCPAWarn : bool g_bCPAWarn
+    double m_CPAWarn_NM=pPlugIn->GetCPAWarn(); //CPAWarnMi : CPA alarmi if CPA < this ; g_CPAWarn_NM
+    bool   m_bTCPA_Max=pPlugIn->GetbTCPAMax(); //bTCPAMax : bool g_bTCPA_Max
+    double m_TCPA_Max=pPlugIn->GetTCPAMax();  //TCPAMaxMinutes : warn if CPA is less than this ; double g_TCPA_Max
+        
+    wxString logsettings = _T("");
+    logsettings << "bCPAMAX:" << m_bCPAMax;
+    logsettings << " CPMax:" << m_CPAMax_NM;
+    logsettings << " bCPAWarn:" << m_bCPAWarn;
+    logsettings << " CPAWarn:" << m_CPAWarn_NM;
+    logsettings << " bTCPA:" << m_bTCPA_Max;
+    logsettings << " TCPA:" << m_TCPA_Max;
+    wxLogMessage(logsettings);
+    
     // Show other boats and base stations
     Target    dt;
 //    ArrayOfPlugIn_AIS_Targets *AisTargets = pPlugIn->GetAisTargets();

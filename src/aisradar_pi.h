@@ -97,6 +97,18 @@ public:
     double           GetMooredSpeed    (void);
     bool             ShowCogArrows     (void);
     int              GetCogArrowMinutes(void);
+    bool            GetbCPAMax(void);
+        //bNoCPAMax  : bool g_bCPAMax : No (T)CPA Alerts if range is >
+    double          GetNoCPAMax(void);
+        //NoCPAMaxNMi : no cpa alarm if range > this ; double g_CPAMax_NM
+    bool            GetbCPAWarn(void);
+        //bCPAWarn : bool g_bCPAWarn
+    double          GetCPAWarn(void);
+        //CPAWarnMi : CPA alarmi if CPA < this ; g_CPAWarn_NM
+    bool            GetbTCPAMax(void);
+        //bTCPAMax : bool g_bTCPA_Max
+    double          GetTCPAMax(void);
+        //TCPAMaxMinutes : warn if CPA is less than this ; double g_TCPA_Max
 
 private:
     bool LoadConfig(void);
