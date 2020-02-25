@@ -29,6 +29,7 @@
 #ifndef _RADAR_H_
 #define _RADAR_H_
 
+#include <time.h>
 #include "wx/wxprec.h"
 #include "wx/dcbuffer.h"
 #include "Target.h"
@@ -131,6 +132,7 @@ private:
     double                  m_Ebl;
     int                     m_Range;
     ViewState              *m_pViewState;
+    time_t                  m_lastCheck = 0;
 };
 
 #endif

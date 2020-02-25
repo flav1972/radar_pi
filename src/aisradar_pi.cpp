@@ -106,6 +106,7 @@ int aisradar_pi::Init(void) {
     m_lat= m_lon=0.;
     m_cog= m_sog=0.;
     m_sats=0;
+    m_command=_T("");
     ::wxDisplaySize(&m_display_width, &m_display_height);
     m_pconfig = GetOCPNConfigObject();
     LoadConfig();
@@ -231,7 +232,7 @@ void aisradar_pi::ShowPreferencesDialog( wxWindow* parent ) {
     wxStaticText* commandtext = new wxStaticText(dialog, -1, _("Command:"), wxDefaultPosition, wxSize(-1, -1), 0);
     CommandBox->Add(commandtext, 0, wxRIGHT|wxALIGN_CENTER_VERTICAL);
 
-    m_tCommand = new wxTextCtrl( dialog, -1, _("/home/pi/alarme.py"), wxDefaultPosition, wxSize(200,-1), wxTE_LEFT);
+    m_tCommand = new wxTextCtrl( dialog, -1, m_command, wxDefaultPosition, wxSize(200,-1), wxTE_LEFT);
     CommandBox->Add(m_tCommand, 0, wxALIGN_CENTER_VERTICAL);
     RadarBoxSizer->Add(CommandBox, 0, wxALIGN_LEFT|wxALL, 5);
 
@@ -252,6 +253,7 @@ void aisradar_pi::ShowPreferencesDialog( wxWindow* parent ) {
               }
          }
          m_radar_use_ais    = m_pRadarUseAis->GetValue();
+         m_command = m_tCommand->GetValue();
          SaveConfig();
     }
 }
@@ -399,6 +401,7 @@ bool aisradar_pi::LoadConfig(void) {
         pConf->Read ( _T( "ShowRADARIcon" ),  &m_radar_show_icon, 1 );
         pConf->Read ( _T( "UseAisRadar" ),  &m_radar_use_ais, 1 );
         pConf->Read ( _T( "NorthUp" ),  &m_radar_north_up, 0 );
+        pConf->Read ( _T ( "RadarCommand" ), &m_command, _T("autre commande"));
         m_radar_frame_sx  = pConf->Read ( _T ( "RADARDialogSizeX" ),   300L );
         m_radar_frame_sy  = pConf->Read ( _T ( "RADARDialogSizeY" ),   300L );
         m_radar_frame_x   = pConf->Read ( _T ( "RADARDialogPosX" ),     50L );
@@ -417,6 +420,7 @@ bool aisradar_pi::SaveConfig(void) {
         pConf->SetPath ( _T ( "/Settings" ) );
         pConf->Write   ( _T ( "ShowRADARIcon" ),      m_radar_show_icon  );
         pConf->Write   ( _T ( "UseAisRadar" ),        m_radar_use_ais    );
+        pConf->Write   ( _T ( "RadarCommand" ),       m_command          );
         pConf->Write   ( _T ( "NorthUp" ),            m_radar_north_up   );
         pConf->Write   ( _T ( "RADARDialogSizeX" ),   m_radar_frame_sx   );
         pConf->Write   ( _T ( "RADARDialogSizeY" ),   m_radar_frame_sy   );

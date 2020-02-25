@@ -90,6 +90,7 @@ public:
     double           GetSog            (void)   { return m_sog;           }
     int              GetSats           (void)   { return m_sats;          }
     wxFileConfig    *GetConfig         (void)   { return m_pconfig;       }
+    wxString         GetCommand        (void)   { return m_command;      }
     ArrayOfPlugIn_AIS_Targets  *GetAisTargets();
     void OnRadarFrameClose();
     bool             ShowMoored        (void);
@@ -119,6 +120,7 @@ private:
     bool              m_radar_show_icon;
     bool              m_radar_use_ais;
     bool              m_radar_north_up;
+    wxString          m_command;
     wxCheckBox       *m_pRadarShowIcon;
     wxCheckBox       *m_pRadarUseAis;
     wxTextCtrl       *m_tCommand;

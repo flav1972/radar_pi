@@ -26,10 +26,13 @@
  ***************************************************************************
  *
  */
+#include <iostream>
 #include "wx/wx.h"
 #include <wx/debug.h>
 #include <wx/fileconf.h>
+#include <wx/process.h>
 #include <math.h>
+#include <time.h>
 #define min(a,b)  ( (a>b)? b : a)
 #define max(a,b)  ( (a>b)? a : b)
 #include "aisradar_pi.h"
@@ -291,6 +294,19 @@ void RadarFrame::TrimAisField(wxString *fld) {
 
 
 void RadarFrame::renderBoats(wxDC& dc, wxPoint &center, wxSize &size, int radius, ArrayOfPlugIn_AIS_Targets *AisTargets ) {
+    time_t now;
+
+    wxString logs = _T("Render Boats");
+    logs += " 1";
+    wxLogMessage(logs);
+    
+    now = time(NULL);
+
+    bool check_alarm = (now - this->m_lastCheck) > 30; 
+
+    if (check_alarm)
+        wxLogMessage(_T("Alarms check"));
+
     // Determine orientation
     double offset=pPlugIn->GetCog();
     if (m_pNorthUp->GetValue()) {
@@ -328,8 +344,34 @@ void RadarFrame::renderBoats(wxDC& dc, wxPoint &center, wxSize &size, int radius
                     t->Class, t->alarm_state, t->ROTAIS
                 );
                 dt.Render(dc);
+                if ( check_alarm) { 
+                    // TCPA double minutes
+                    // CPA  double miles
+                    wxString targetlog = _T("Target: MMSI=");
+                    targetlog << t->MMSI;
+                    targetlog << _T(" Range=") << t->Range_NM;
+                    targetlog << _T(" CPA=") << t->CPA;
+                    targetlog << _T(" TCPA=") << t->TCPA;
+                    wxLogMessage(targetlog);
+                    if(t->Range_NM < 16.0) {
+                        wxLogMessage(_T("Run alarm"));
+                        if(!wxProcess::Open(pPlugIn->GetCommand())) {
+                           wxMessageDialog mdlg(GetOCPNCanvasWindow(),
+                             _("Failed to execute command: ") + pPlugIn->GetCommand(),
+                             _("Radar Alert"), wxOK | wxICON_ERROR);
+                           mdlg.ShowModal();
+                        }
+                    }
+                }
             }
         }
+    }
+    if (check_alarm) {
+        wxString logs = _T("Update LastCheck");
+        logs += 1;
+        wxLogMessage(logs);
+
+        this->m_lastCheck = now;
     }
 }
 
