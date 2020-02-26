@@ -110,6 +110,7 @@ public:
 private:
     void OnClose(wxCloseEvent& event);
     void OnRange( wxCommandEvent& event );
+    void OnAlarmRange( wxCommandEvent& event );
 	void OnNorthUp( wxCommandEvent& event );
     void OnBearingLine( wxCommandEvent& event );
     void OnTimer( wxTimerEvent& event );
@@ -131,8 +132,10 @@ private:
     wxColor                 m_BgColour;
     double                  m_Ebl;
     int                     m_Range;
+    wxTextCtrl             *m_tAlarmRange;
+    double                  m_AlarmRange;
     ViewState              *m_pViewState;
-    time_t                  m_lastCheck = 0;
+    time_t                  m_lastCheck;
 };
 
 #endif

@@ -47,6 +47,7 @@ enum    Ids { cbRangeId = 10001,
                 cbBearingLineId,
                 tmRefreshId,
                 plCanvasId,
+                tAlarmRangeId,
 };
 
 static const int RESTART  = -1;
@@ -66,6 +67,7 @@ BEGIN_EVENT_TABLE ( RadarFrame, wxDialog )
     EVT_COMBOBOX ( cbRangeId, RadarFrame::OnRange)
     EVT_CHECKBOX ( cbNorthUpId, RadarFrame::OnNorthUp )
     EVT_CHECKBOX ( cbBearingLineId, RadarFrame::OnBearingLine )
+    EVT_TEXT ( tAlarmRangeId, RadarFrame::OnAlarmRange)
     EVT_TIMER    ( tmRefreshId, RadarFrame::OnTimer )
 
 END_EVENT_TABLE()
@@ -80,9 +82,12 @@ RadarFrame::RadarFrame()
     m_pBearingLine(0), 
     m_BgColour(),
     m_Ebl(0.0),  
-    m_Range(0), 
+    m_Range(0),
+    m_tAlarmRange(0),
+    m_AlarmRange(0.0),
     m_pViewState(0)
 {
+    m_lastCheck = 0;
     Init();
 }
 
@@ -129,7 +134,7 @@ bool RadarFrame::Create ( wxWindow *parent, aisradar_pi *ppi, wxWindowID id,
     wxStaticBox    *sb=new wxStaticBox(panel,wxID_ANY, _("Options"));
     wxStaticBoxSizer *controls = new wxStaticBoxSizer(sb, wxHORIZONTAL);
     wxStaticText *st1 = new wxStaticText(panel,wxID_ANY,_("Range"));
-    controls->Add(st1,0,wxRIGHT,5);
+    controls->Add(st1,0,wxLEFT|wxALIGN_CENTER_VERTICAL,5);
     m_pRange = new wxComboBox(panel, cbRangeId, wxT(""));
     m_pRange->Append(wxT("0.25"));
     m_pRange->Append(wxT("0.5") );
@@ -141,18 +146,34 @@ bool RadarFrame::Create ( wxWindow *parent, aisradar_pi *ppi, wxWindowID id,
     m_pRange->Append(wxT("16")  );
     m_pRange->Append(wxT("32")  );
     m_pRange->SetSelection(pPlugIn->GetRadarRange());
-    controls->Add(m_pRange);
+    controls->Add(m_pRange,0,wxLEFT|wxALIGN_CENTER_VERTICAL,5);
 
     wxStaticText *st2 = new wxStaticText(panel,wxID_ANY,_("Nautical Miles"));
-    controls->Add(st2,0,wxRIGHT|wxLEFT,5);
+    controls->Add(st2,0,wxLEFT|wxALIGN_CENTER_VERTICAL,5);
 
     m_pNorthUp = new wxCheckBox(panel, cbNorthUpId, _("North Up"));
     m_pNorthUp->SetValue(pPlugIn->GetRadarNorthUp());
-    controls->Add(m_pNorthUp, 0, wxLEFT, 10);
+    controls->Add(m_pNorthUp, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 15);
 
     m_pBearingLine = new wxCheckBox(panel, cbBearingLineId, _("EBL"));
     m_pBearingLine->SetValue(false);
-    controls->Add(m_pBearingLine, 0, wxLEFT, 10);
+    controls->Add(m_pBearingLine, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 15);
+
+    wxStaticText *st3 = new wxStaticText(panel,wxID_ANY,_("Range Alarm Miles"));
+    controls->Add(st3,0,wxLEFT|wxALIGN_CENTER_VERTICAL,15);
+
+    m_tAlarmRange = new wxTextCtrl(panel, tAlarmRangeId, "", wxDefaultPosition, wxSize(80,-1), wxTE_LEFT);
+    wxString s;
+    s.Printf(_T("%4.1f"), pPlugIn->GetRadarAlarmRange());
+    m_tAlarmRange->SetValue(s);
+    wxString logsettings = _T("");
+    logsettings << "GetRadarmAlarmRange:" << s;
+    wxLogMessage(logsettings);
+
+    controls->Add(m_tAlarmRange, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 5);
+
+//  m_pText_CPA_Max->GetValue().ToDouble(&g_CPAMax_NM);
+
     vbox->Add(controls, 0, wxEXPAND | wxALL, 5);
 
     // Add timer
@@ -177,6 +198,13 @@ void RadarFrame::OnClose ( wxCloseEvent& event ) {
     m_Timer->Stop();
     delete m_Timer;
     
+    // Save alarm range
+    m_tAlarmRange->GetValue().ToDouble(&m_AlarmRange);
+    pPlugIn->SetRadarAlarmRange(m_AlarmRange);
+    wxString logsettings = _T("OnClose");
+    logsettings << "SaveRadarAlarmRange:" << m_AlarmRange;
+    wxLogMessage(logsettings);
+    
     // Save window size
     pPlugIn->SetRadarFrameX(m_pViewState->GetPos().x);
     pPlugIn->SetRadarFrameY(m_pViewState->GetPos().y);
@@ -195,6 +223,14 @@ void RadarFrame::OnRange ( wxCommandEvent& event ) {
     this->Refresh();
 }
 
+void RadarFrame::OnAlarmRange ( wxCommandEvent& event ) {
+    m_tAlarmRange->GetValue().ToDouble(&m_AlarmRange);
+    pPlugIn->SetRadarAlarmRange(m_AlarmRange);
+    wxString logsettings = _T("OnAlarmRange");
+    logsettings << "SaveRadarAlarmRange:" << m_AlarmRange;
+    wxLogMessage(logsettings);
+    this->Refresh();
+}
 
 
 void RadarFrame::OnNorthUp ( wxCommandEvent& event ) {
@@ -330,8 +366,9 @@ void RadarFrame::renderBoats(wxDC& dc, wxPoint &center, wxSize &size, int radius
     logsettings << " CPAWarn:" << m_CPAWarn_NM;
     logsettings << " bTCPA:" << m_bTCPA_Max;
     logsettings << " TCPA:" << m_TCPA_Max;
+    logsettings << " Range:" << m_AlarmRange;
     wxLogMessage(logsettings);
-    
+
     // Show other boats and base stations
     Target    dt;
 //    ArrayOfPlugIn_AIS_Targets *AisTargets = pPlugIn->GetAisTargets();

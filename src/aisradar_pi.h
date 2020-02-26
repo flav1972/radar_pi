@@ -86,6 +86,8 @@ public:
     void             SetRadarRange     (int x)  { m_radar_range    = x;   }
     bool             GetRadarNorthUp   (void)   { return m_radar_north_up;}
     int              GetRadarRange     (void)   { return m_radar_range;   }
+    double           GetRadarAlarmRange(void)   { return m_radar_alarmrange;   }
+    void             SetRadarAlarmRange(double x) { m_radar_alarmrange = x;   }
     double           GetCog            (void)   { return m_cog;           }
     double           GetSog            (void)   { return m_sog;           }
     int              GetSats           (void)   { return m_sats;          }
@@ -136,6 +138,7 @@ private:
     wxCheckBox       *m_pRadarShowIcon;
     wxCheckBox       *m_pRadarUseAis;
     wxTextCtrl       *m_tCommand;
+    double            m_radar_alarmrange;
 };
 
 #endif

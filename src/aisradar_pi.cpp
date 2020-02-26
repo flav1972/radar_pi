@@ -455,6 +455,7 @@ bool aisradar_pi::LoadConfig(void) {
         m_radar_frame_x   = pConf->Read ( _T ( "RADARDialogPosX" ),     50L );
         m_radar_frame_y   = pConf->Read ( _T ( "RADARDialogPosY" ),    170L );
         m_radar_range     = pConf->Read ( _T ( "RADARRange" ),           4L );
+        pConf->Read ( _T ( "RADARAlarmRange" ), &m_radar_alarmrange, 0.0);
         return true;
     } else {
         return false;
@@ -475,6 +476,7 @@ bool aisradar_pi::SaveConfig(void) {
         pConf->Write   ( _T ( "RADARDialogPosX" ),    m_radar_frame_x    );
         pConf->Write   ( _T ( "RADARDialogPosY" ),    m_radar_frame_y    );
         pConf->Write   ( _T ( "RADARRange" ),         m_radar_range      );
+        pConf->Write   ( _T ( "RADARAlarmRange" ),    m_radar_alarmrange );
         return true;
     } else {
         return false;
