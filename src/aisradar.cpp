@@ -335,6 +335,7 @@ void RadarFrame::renderBoats(wxDC& dc, wxPoint &center, wxSize &size, int radius
     now = time(NULL);
 
     bool check_alarm = (now - this->m_lastCheck) > 30; 
+    bool do_alarm = false;
 
     if (check_alarm)
         wxLogMessage(_T("Alarms check"));
@@ -358,16 +359,6 @@ void RadarFrame::renderBoats(wxDC& dc, wxPoint &center, wxSize &size, int radius
     double m_CPAWarn_NM=pPlugIn->GetCPAWarn(); //CPAWarnMi : CPA alarmi if CPA < this ; g_CPAWarn_NM
     bool   m_bTCPA_Max=pPlugIn->GetbTCPAMax(); //bTCPAMax : bool g_bTCPA_Max
     double m_TCPA_Max=pPlugIn->GetTCPAMax();  //TCPAMaxMinutes : warn if CPA is less than this ; double g_TCPA_Max
-        
-    wxString logsettings = _T("");
-    logsettings << "bCPAMAX:" << m_bCPAMax;
-    logsettings << " CPMax:" << m_CPAMax_NM;
-    logsettings << " bCPAWarn:" << m_bCPAWarn;
-    logsettings << " CPAWarn:" << m_CPAWarn_NM;
-    logsettings << " bTCPA:" << m_bTCPA_Max;
-    logsettings << " TCPA:" << m_TCPA_Max;
-    logsettings << " Range:" << m_AlarmRange;
-    wxLogMessage(logsettings);
 
     // Show other boats and base stations
     Target    dt;
@@ -394,7 +385,18 @@ void RadarFrame::renderBoats(wxDC& dc, wxPoint &center, wxSize &size, int radius
                     t->Class, t->alarm_state, t->ROTAIS
                 );
                 dt.Render(dc);
-                if ( check_alarm) { 
+                if (check_alarm) {                      
+                    /*
+                    wxString logsettings = _T("");
+                    logsettings << "bCPAMAX:" << m_bCPAMax;
+                    logsettings << " CPMax:" << m_CPAMax_NM;
+                    logsettings << " bCPAWarn:" << m_bCPAWarn;
+                    logsettings << " CPAWarn:" << m_CPAWarn_NM;
+                    logsettings << " bTCPA:" << m_bTCPA_Max;
+                    logsettings << " TCPA:" << m_TCPA_Max;
+                    logsettings << " Range:" << m_AlarmRange;
+                    wxLogMessage(logsettings);
+                    
                     // TCPA double minutes
                     // CPA  double miles
                     wxString targetlog = _T("Target: MMSI=");
@@ -402,18 +404,36 @@ void RadarFrame::renderBoats(wxDC& dc, wxPoint &center, wxSize &size, int radius
                     targetlog << _T(" Range=") << t->Range_NM;
                     targetlog << _T(" CPA=") << t->CPA;
                     targetlog << _T(" TCPA=") << t->TCPA;
+                    targetlog << _T(" TCPA=") << t->alarm_state;
                     wxLogMessage(targetlog);
-                    if(t->Range_NM < 16.0) {
-                        wxLogMessage(_T("Run alarm"));
-                        if(!wxProcess::Open(pPlugIn->GetCommand())) {
-                           wxMessageDialog mdlg(GetOCPNCanvasWindow(),
-                             _("Failed to execute command: ") + pPlugIn->GetCommand(),
-                             _("Radar Alert"), wxOK | wxICON_ERROR);
-                           mdlg.ShowModal();
+*/
+                    if(t->alarm_state != PI_AIS_ALARM_ACKNOWLEDGED) {
+                        // alarm if Range < Module Alarm Range
+                        if(t->Range_NM < m_AlarmRange) {
+                            do_alarm = true;
+                        }
+                        // if ranche check is not set or if it is set and range is <=
+                        if(!m_bCPAMax || t->Range_NM <= m_CPAMax_NM) {
+                            // if CPA warning and CPA < 
+                            if(m_bCPAWarn && t->CPA <= m_CPAWarn_NM) {
+                                // and if TCPA is lower or TCPA is not checked
+                                if(!m_bTCPA_Max || t->TCPA <= m_TCPA_Max) {
+                                    do_alarm = true;
+                                }
+                            }
                         }
                     }
                 }
             }
+        }
+    }
+    if (do_alarm) {
+        wxLogMessage(_T("Run alarm"));
+        if(!wxProcess::Open(pPlugIn->GetCommand())) {
+           wxMessageDialog mdlg(GetOCPNCanvasWindow(),
+             _("Failed to execute command: ") + pPlugIn->GetCommand(),
+             _("Radar Alert"), wxOK | wxICON_ERROR);
+           mdlg.ShowModal();
         }
     }
     if (check_alarm) {
