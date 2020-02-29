@@ -141,7 +141,7 @@ bool RadarFrame::Create ( wxWindow *parent, aisradar_pi *ppi, wxWindowID id,
     wxStaticBox    *sb=new wxStaticBox(panel,wxID_ANY, _("Options"));
     wxStaticBoxSizer *controls = new wxStaticBoxSizer(sb, wxHORIZONTAL);
     wxStaticText *st1 = new wxStaticText(panel,wxID_ANY,_("Range"));
-    controls->Add(st1,0,wxLEFT|wxALIGN_CENTER_VERTICAL,5);
+    controls->Add(st1,0,wxLEFT|wxBOTTOM|wxALIGN_CENTER_VERTICAL,5);
     m_pRange = new wxComboBox(panel, cbRangeId, wxT(""));
     m_pRange->Append(wxT("0.25"));
     m_pRange->Append(wxT("0.5") );
@@ -177,7 +177,7 @@ bool RadarFrame::Create ( wxWindow *parent, aisradar_pi *ppi, wxWindowID id,
     logsettings << "GetRadarmAlarmRange:" << s;
     wxLogMessage(logsettings);
 
-    controls->Add(m_tAlarmRange, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 5);
+    controls->Add(m_tAlarmRange, 0, wxLEFT|wxBOTTOM|wxALIGN_CENTER_VERTICAL, 5);
 
 //  m_pText_CPA_Max->GetValue().ToDouble(&g_CPAMax_NM);
 
@@ -341,7 +341,7 @@ void RadarFrame::renderBoats(wxDC& dc, wxPoint &center, wxSize &size, int radius
 
     now = time(NULL);
 
-    bool check_alarm = (now - this->m_lastCheck) > 30; 
+    bool check_alarm = (now - this->m_lastCheck) > pPlugIn->GetAlarmInterval(); 
     bool do_alarm = false;
 
     if (check_alarm)

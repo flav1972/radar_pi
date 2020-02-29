@@ -86,6 +86,7 @@ public:
     void             SetRadarRange     (int x)  { m_radar_range    = x;   }
     bool             GetRadarNorthUp   (void)   { return m_radar_north_up;}
     int              GetRadarRange     (void)   { return m_radar_range;   }
+    int              GetAlarmInterval  (void)   { return m_interval;      }
     double           GetRadarAlarmRange(void)   { return m_radar_alarmrange;   }
     void             SetRadarAlarmRange(double x) { m_radar_alarmrange = x;   }
     double           GetCog            (void)   { return m_cog;           }
@@ -139,6 +140,8 @@ private:
     wxCheckBox       *m_pRadarUseAis;
     wxTextCtrl       *m_tCommand;
     double            m_radar_alarmrange;
+    wxTextCtrl       *m_tInterval;
+    int               m_interval;
 };
 
 #endif

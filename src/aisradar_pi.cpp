@@ -236,6 +236,19 @@ void aisradar_pi::ShowPreferencesDialog( wxWindow* parent ) {
     CommandBox->Add(m_tCommand, 0, wxALIGN_CENTER_VERTICAL);
     RadarBoxSizer->Add(CommandBox, 0, wxALIGN_LEFT|wxALL, 5);
 
+    // Interval
+    wxBoxSizer* IntervalBox = new wxBoxSizer(wxHORIZONTAL);
+    wxStaticText* intervaltext = new wxStaticText(dialog, -1, _("Alarm Check interval (seconds):"), wxDefaultPosition, wxSize(-1, -1), 0);
+    IntervalBox->Add(intervaltext, 0, wxRIGHT|wxALIGN_CENTER_VERTICAL);
+
+    m_tInterval = new wxTextCtrl( dialog, -1, "", wxDefaultPosition, wxSize(40,-1), wxTE_LEFT);
+    wxString s;
+    s.Printf(_T("%3d"), m_interval);
+    m_tInterval->SetValue(s);
+    IntervalBox->Add(m_tInterval, 0, wxALIGN_CENTER_VERTICAL);
+    RadarBoxSizer->Add(IntervalBox, 0, wxALIGN_LEFT|wxALL, 5);
+
+    // check boxes
     wxStdDialogButtonSizer* DialogButtonSizer = dialog->CreateStdDialogButtonSizer(wxOK|wxCANCEL);
     PanelSizer->Add(DialogButtonSizer, 0, wxALIGN_RIGHT|wxALL, 5);
     dialog->Fit();
@@ -254,6 +267,7 @@ void aisradar_pi::ShowPreferencesDialog( wxWindow* parent ) {
          }
          m_radar_use_ais    = m_pRadarUseAis->GetValue();
          m_command = m_tCommand->GetValue();
+         m_interval = wxAtoi(m_tInterval->GetValue());
          SaveConfig();
     }
 }
@@ -449,13 +463,14 @@ bool aisradar_pi::LoadConfig(void) {
         pConf->Read ( _T( "ShowRADARIcon" ),  &m_radar_show_icon, 1 );
         pConf->Read ( _T( "UseAisRadar" ),  &m_radar_use_ais, 1 );
         pConf->Read ( _T( "NorthUp" ),  &m_radar_north_up, 0 );
-        pConf->Read ( _T ( "RadarCommand" ), &m_command, _T(" commande"));
+        pConf->Read ( _T ( "RadarCommand" ), &m_command, _T("command"));
         m_radar_frame_sx  = pConf->Read ( _T ( "RADARDialogSizeX" ),   300L );
         m_radar_frame_sy  = pConf->Read ( _T ( "RADARDialogSizeY" ),   300L );
         m_radar_frame_x   = pConf->Read ( _T ( "RADARDialogPosX" ),     50L );
         m_radar_frame_y   = pConf->Read ( _T ( "RADARDialogPosY" ),    170L );
         m_radar_range     = pConf->Read ( _T ( "RADARRange" ),           4L );
         pConf->Read ( _T ( "RADARAlarmRange" ), &m_radar_alarmrange, 0.0);
+        pConf->Read ( _T ( "AlarmInterval" ), &m_interval, 30);
         return true;
     } else {
         return false;
@@ -477,6 +492,7 @@ bool aisradar_pi::SaveConfig(void) {
         pConf->Write   ( _T ( "RADARDialogPosY" ),    m_radar_frame_y    );
         pConf->Write   ( _T ( "RADARRange" ),         m_radar_range      );
         pConf->Write   ( _T ( "RADARAlarmRange" ),    m_radar_alarmrange );
+        pConf->Write   ( _T ( "AlarmInterval" ),      m_interval);
         return true;
     } else {
         return false;
